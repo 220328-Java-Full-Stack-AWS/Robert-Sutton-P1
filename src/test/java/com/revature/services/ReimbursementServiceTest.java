@@ -34,7 +34,8 @@ public class ReimbursementServiceTest {
 		reimbursementService = new ReimbursementService();
 		reimbursementDAO = mock(ReimbursementDAO.class);
 	}
-	
+
+	/*
 	@Before
 	public void setUp() throws Exception {
 		GENERIC_EMPLOYEE_1 = new User(1, "genericEmployee1", "genericPassword", Role.EMPLOYEE);
@@ -48,6 +49,8 @@ public class ReimbursementServiceTest {
 		GENERIC_ALL_PENDING_REIMBURSEMENTS = new ArrayList<Reimbursement>();
 		GENERIC_ALL_PENDING_REIMBURSEMENTS.add(GENERIC_REIMBURSEMENT_1);
 	}
+
+	 */
 	
 	@Test
 	public void testProcessPassesWhenUserIsFinanceManagerAndReimbursementExistsAndUpdateSuccessful() {
