@@ -67,6 +67,8 @@ public class User extends Model implements Comparable<User>{
         return UserDao.read(username);
     }
 
+    public static User User(String first, String last) {return UserDao.read(first, last); }
+
     public User(String first, String last, String username, String email, String password, List<Post> posts, Set<User> followers, Set<User> following) {
         this.email = email;
         this.first = first;

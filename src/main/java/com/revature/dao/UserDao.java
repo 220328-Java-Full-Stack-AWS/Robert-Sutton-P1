@@ -66,6 +66,37 @@ public interface UserDao extends CRUDInterface<User> {
         }
     }
 
+    public static User read(String first, String last) {
+        User model = new User();
+        boolean hasRows = false;
+        try{
+            String SQL = "SELECT * FROM p1.ers_users WHERE user_first_name = ? AND user_last_name = ?";
+            Connection conn = ConnectionManager.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(SQL);
+            pstmt.setString(1, first);
+            pstmt.setString(2, last);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                hasRows = true;
+                model.setId(rs.getInt("ERS_USERS_ID"));
+                model.setFirst(rs.getString("USER_FIRST_NAME"));
+                model.setLast(rs.getString("USER_LAST_NAME"));
+                model.setUsername(rs.getString("ERS_USERNAME"));
+                model.setPassword(rs.getString("ers_password"));
+                model.setEmail(rs.getString("USER_EMAIL"));
+                model.setRole(rs.getInt("USER_ROLE_ID"));
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+            return null;
+        }
+        if(hasRows){
+            return model;
+        } else {
+            return null;
+        }
+    }
+
 
     public static List<User> getAllUsers(){
         User model = new User();

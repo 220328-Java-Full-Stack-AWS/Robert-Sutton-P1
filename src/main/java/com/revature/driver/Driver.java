@@ -40,7 +40,7 @@ public class Driver {
         // Is user already registered?
         //User u = UserDao.read(first, last);
         String userName = UserService.getUserName(first, last);
-        User u = User.User(userName);
+        User u = User.User(first, last);
         //String userName = u.getUsername();
 
         boolean mayRegister = false;
@@ -126,6 +126,7 @@ public class Driver {
                         String vendor = scan.nextLine();
                         System.out.println("Enter invoice number");
                         String invoice = scan.nextLine();
+                        System.out.println("DEBUG: " + description + " " + u + " " + typeId + " " + amount );
                         r = ReimbursementService.create(description, u, typeId, amount, vendor, invoice);
 
                         System.out.println(r.toString());

@@ -5,23 +5,25 @@ import com.revature.models.Reimbursement;
 import com.revature.models.User;
 
 import java.sql.*;
+import java.util.LinkedList;
 import java.util.List;
 
-public interface ReimbursementDao extends CRUDInterface<Reimbursement>{
+public class ReimbursementDao implements CRUDInterface<Reimbursement>{
 
     @Override
-    public default Reimbursement create(Reimbursement model) {
+    public Reimbursement create(Reimbursement model) {
         String SQL = "INSERT INTO ERS_REIMBURSEMENT (REIMB_AUTHOR_ID, REIMB_TYPE_ID, REIMB_AMOUNT, REIMB_VENDOR, REIMB_INVOICE, REIMB_STATUS_ID)" +
                 " VALUES (?, ?, ?, ?, ?, ?)";
         try {
-            System.out.println("ReimbursementDAO, Line 16, create");
-            System.out.println("Author" + model.getAuthorId());
-            System.out.println("Reimbursement status: " + model.getStatus());
-            System.out.println(SQL);
-            System.out.println(model.getAuthorId() + " " + model.getStatusId());
+            System.out.println("ReimbursementDAO, Line 18, create");
+            User temp = model.getAuthor();
+            System.out.println("Line 20. Author:  " + temp); //This is how we want to pull the author ID
+            System.out.println("Line 21. Reimbursement status: " + model.getStatus());
+            System.out.println("Line 22. " + SQL);
+            //System.out.println("Line 23. " + model.getAuthor().getId() + " " + model.getStatusId());
             Connection conn = ConnectionManager.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(SQL, Statement.RETURN_GENERATED_KEYS);
-            pstmt.setInt(1, model.getAuthorId());
+            pstmt.setInt(1, model.getAuthor().getId());
             pstmt.setInt(2, model.getTypeId());
             pstmt.setBigDecimal(3, model.getAmount());
             pstmt.setString(4, model.getVendor());
@@ -41,20 +43,20 @@ public interface ReimbursementDao extends CRUDInterface<Reimbursement>{
         return model;
     }
 
-    public static Reimbursement read(User author){
+    public Reimbursement read(int authorId){
         Reimbursement model = new Reimbursement();
         boolean hasRows = false;
         try{
             String SQL = "SELECT * FROM ERS_REIMBURSEMENT WHERE REIMB_AUTHOR_ID = ?";
             Connection conn = ConnectionManager.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(SQL);
-            pstmt.setInt(1,author.getId());
+            pstmt.setInt(1, authorId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 hasRows = true;
                 model.setId(rs.getInt("REIMB_ID"));
                 model.setSubmitted(rs.getDate("REIMB_SUBMITTED"));
-                model.setAuthorId(rs.getInt("REIMB_AUTHOR_ID"));
+                model.getAuthor().setId((rs.getInt("REIMB_AUTHOR_ID")));
                 model.setTypeId(rs.getInt("REIMB_TYPE_ID"));
                 model.setAmount(rs.getBigDecimal("REIMB_AMOUNT"));
                 model.setVendor(rs.getString("REIMB_VENDOR"));
@@ -120,39 +122,25 @@ public interface ReimbursementDao extends CRUDInterface<Reimbursement>{
     }
 
 
-
-
-
-
-
-
-
+    @Override
+    public void update(Reimbursement model){
+        return;
+    }
 
 
     @Override
-    void update(Reimbursement model);
+    public void delete(int id){
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    }
 
     @Override
-    void delete(int id);
+    public void delete(Reimbursement model){
+
+    }
 
     @Override
-    void delete(Reimbursement model);
-
-    @Override
-    List<Reimbursement> getAll();
+    public List<Reimbursement> getAll(){
+        List<Reimbursement> list = new LinkedList<>();
+        return list;
+    }
 }

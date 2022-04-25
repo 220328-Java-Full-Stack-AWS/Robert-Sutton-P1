@@ -76,32 +76,7 @@ public class ReimbursementService {
         Reimbursement r = new Reimbursement(description, author, typeId, amount, vendor, invoice);
 
         //From the service, we would make our database call to actually store this reimbursement away
-        ReimbursementDao dao = new ReimbursementDao() {
-            @Override
-            public void update(Reimbursement model) {
-
-            }
-
-            @Override
-            public void delete(int id) {
-
-            }
-
-            @Override
-            public void delete(Reimbursement model) {
-
-            }
-
-            @Override
-            public List<Reimbursement> getAll() {
-                return null;
-            }
-
-            @Override
-            public Reimbursement read(int id) {
-                return null;
-            }
-        };
+        ReimbursementDao dao = new ReimbursementDao();
 
         dao.create(r);
         return r;

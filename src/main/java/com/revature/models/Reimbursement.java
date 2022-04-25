@@ -36,7 +36,7 @@ public class Reimbursement extends com.revature.models.Model {
     private String description;
     private Date submitted;
     private User author;
-    private int authorId;
+    //private int authorId;
     private int type;
     private int typeId;
     private BigDecimal amount;
@@ -47,10 +47,15 @@ public class Reimbursement extends com.revature.models.Model {
     private User resolver;
     private int resolverId;
 
+    public User getAuthor() {
+        return author;
+    }
 
+    public void setAuthor(User author) {
+        this.author = author;
+    }
 
-
-    //public Reimbursement() {
+//public Reimbursement() {
     //    getAllReimbursements = new ArrayList<>();
     //}
 
@@ -82,7 +87,7 @@ public class Reimbursement extends com.revature.models.Model {
         this.description = description;
         this.submitted = submitted;
         this.author = author;
-        this.authorId = authorId;
+        //this.authorId = authorId;
         this.type = type;
         this.amount = amount;
         this.vendor = vendor;
@@ -124,13 +129,13 @@ public class Reimbursement extends com.revature.models.Model {
         this.vendor = email;
     }
 
-    public int getAuthorId() {
-        return authorId;
-    }
-
-    public void setAuthorId(int authorId) {
-        this.authorId = authorId;
-    }
+//    public int getAuthorId() {
+//        return authorId;
+//    }
+//
+//    public void setAuthorId(int authorId) {
+//        this.authorId = authorId;
+//    }
 
     public int getTypeId() {
         return type;
@@ -186,6 +191,8 @@ public class Reimbursement extends com.revature.models.Model {
     public void setResolverId(int resolverId) {
         this.resolverId = resolverId;
     }
+
+
 
 
 
