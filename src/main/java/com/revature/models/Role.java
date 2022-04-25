@@ -19,16 +19,16 @@ package com.revature.models;
  */
 public enum Role {
 
-    EMPLOYEE {
+    USER {
         @Override
         public String toString() {
-            return "Employee";
+            return "User";
         }
     },
-    FINANCE_MANAGER {
+    ADMIN {
         @Override
         public String toString() {
-            return "Finance Manager";
+            return "Admin";
         }
     }
 

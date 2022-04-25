@@ -21,6 +21,10 @@ public enum Status {
             return "Pending";
         }
     },
+    CANCELLED {
+        @Override
+        public String toString() {return "Cancelled";}
+    },
     APPROVED {
         @Override
         public String toString() {
@@ -31,6 +35,12 @@ public enum Status {
         @Override
         public String toString() {
             return "Denied";
+        }
+    },
+    COMPLETED {
+        @Override
+        public String toString() {
+            return "Completed";
         }
     }
 }

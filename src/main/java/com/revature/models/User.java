@@ -1,5 +1,7 @@
 package com.revature.models;
 
+import com.revature.dao.UserDao;
+
 import java.util.*;
 
 /**
@@ -27,7 +29,9 @@ import java.util.*;
  *
  */
 //public class User extends AbstractUser {
-public class User implements Comparable<User>{
+public class User extends Model implements Comparable<User>{
+
+    public static List<User> getAllUsers;
 
     /*
         - String Email
@@ -40,11 +44,13 @@ public class User implements Comparable<User>{
         - Set Following
      */
 
+    private int id;
     private String email;
     private String first;
     private String last;
     private String username;
     private String password;
+    private int role;
     private List<Post> posts;
     private Set<User> followers;
     private Set<User> following;
@@ -57,12 +63,17 @@ public class User implements Comparable<User>{
 
     }
 
+    public static User User(String username) {
+        return UserDao.read(username);
+    }
+
     public User(String first, String last, String username, String email, String password, List<Post> posts, Set<User> followers, Set<User> following) {
         this.email = email;
         this.first = first;
         this.last = last;
         this.username = username;
         this.password = password;
+        this.role = role;
         this.posts = posts;
         this.followers = followers;
         this.following = following;
@@ -74,9 +85,17 @@ public class User implements Comparable<User>{
         this.last = last;
         this.username = username;
         this.password = password;
-        this.posts = new ArrayList<>();
-        this.followers = new HashSet<>();
-        this.following = new HashSet<>();
+        if(role == 0){
+            role = 1; // Default is "User".
+        }
+        this.role = role;
+        //this.posts = new ArrayList<>();
+        //this.followers = new HashSet<>();
+        //this.following = new HashSet<>();
+    }
+
+    public User(int id) {
+
     }
 
     public String getEmail() {
@@ -119,6 +138,14 @@ public class User implements Comparable<User>{
         this.password = password;
     }
 
+    public int getRole() {return role; }
+
+    public void setRole(int role) {this.role = role; }
+
+    public List<User> getAllUsers(){
+        return UserDao.getAllUsers();
+    }
+
     public List<Post> getPosts() {
         return posts;
     }
@@ -143,6 +170,10 @@ public class User implements Comparable<User>{
         this.following = following;
     }
 
+    public int getId() {return id; }
+
+    public void setId(int id) {this.id = id; }
+
     @Override
     public String toString() {
         return "User{" +
@@ -151,9 +182,10 @@ public class User implements Comparable<User>{
                 ", last='" + last + '\'' +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
-                ", posts=" + posts.size() +
-                ", followers=" + followers.size() +
-                ", following=" + following.size() +
+                ", role='" + role + '\'' +
+                //", posts=" + posts.size() +
+                //", followers=" + followers.size() +
+                //", following=" + following.size() +
                 '}';
     }
 

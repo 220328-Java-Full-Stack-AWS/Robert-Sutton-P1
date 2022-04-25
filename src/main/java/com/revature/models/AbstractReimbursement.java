@@ -9,7 +9,7 @@ import java.util.Objects;
  * All reimbursements in this application must at least have:
  * <ul>
  *     <li>ID</li>
- *     <li>Status</li> <!-- Pending, Approved, Denied, Resolved ->
+ *     <li>Status</li> <!-- Pending, Cancelled, Completed, Approved, Denied,  -->
  *     <li>Author</li>
  *     <li>Resolver</li>
  *     <li>Amount</li>
