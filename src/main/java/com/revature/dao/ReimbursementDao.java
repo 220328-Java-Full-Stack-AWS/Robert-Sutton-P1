@@ -5,6 +5,7 @@ import com.revature.models.Reimbursement;
 import com.revature.models.User;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,23 +13,26 @@ public class ReimbursementDao implements CRUDInterface<Reimbursement>{
 
     @Override
     public Reimbursement create(Reimbursement model) {
-        String SQL = "INSERT INTO ERS_REIMBURSEMENT (REIMB_AUTHOR_ID, REIMB_TYPE_ID, REIMB_AMOUNT, REIMB_VENDOR, REIMB_INVOICE, REIMB_STATUS_ID)" +
-                " VALUES (?, ?, ?, ?, ?, ?)";
+        String SQL = "INSERT INTO ERS_REIMBURSEMENT (REIMB_DESCRIPTION, REIMB_SUBMITTED, REIMB_AUTHOR_ID, REIMB_TYPE_ID, REIMB_AMOUNT, REIMB_VENDOR, REIMB_INVOICE, REIMB_STATUS_ID)" +
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try {
             System.out.println("ReimbursementDAO, Line 18, create");
-            User temp = model.getAuthor();
-            System.out.println("Line 20. Author:  " + temp); //This is how we want to pull the author ID
-            System.out.println("Line 21. Reimbursement status: " + model.getStatus());
-            System.out.println("Line 22. " + SQL);
-            //System.out.println("Line 23. " + model.getAuthor().getId() + " " + model.getStatusId());
+            System.out.println("Line 19. Author:  " + model.getAuthorId()); //This is how we want to pull the author ID
+            System.out.println("Line 20. Reimbursement status: " + model.getStatusId());
+            System.out.println("Line 21. " + SQL);
+            System.out.println("Line 22. Reimbursement type = " + model.getTypeId());
+            Date submitted = Date.valueOf(LocalDate.now());
             Connection conn = ConnectionManager.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(SQL, Statement.RETURN_GENERATED_KEYS);
-            pstmt.setInt(1, model.getAuthor().getId());
-            pstmt.setInt(2, model.getTypeId());
-            pstmt.setBigDecimal(3, model.getAmount());
-            pstmt.setString(4, model.getVendor());
-            pstmt.setString(5, model.getInvoice());
-            pstmt.setInt(6, model.getStatusId());
+            pstmt.setString(1, model.getDescription());
+            pstmt.setDate(2, submitted);
+            pstmt.setInt(3, model.getAuthorId());
+            pstmt.setInt(4, model.getTypeId());
+            pstmt.setBigDecimal(5, model.getAmount());
+            pstmt.setString(6, model.getVendor());
+            pstmt.setString(7, model.getInvoice());
+            pstmt.setInt(8, model.getStatusId());
+            System.out.println("Line 31:  " + pstmt.toString());
             pstmt.executeUpdate();
             ResultSet keys = pstmt.getGeneratedKeys();
             if(keys.next()) {
@@ -56,7 +60,7 @@ public class ReimbursementDao implements CRUDInterface<Reimbursement>{
                 hasRows = true;
                 model.setId(rs.getInt("REIMB_ID"));
                 model.setSubmitted(rs.getDate("REIMB_SUBMITTED"));
-                model.getAuthor().setId((rs.getInt("REIMB_AUTHOR_ID")));
+                model.setAuthorId((rs.getInt("REIMB_AUTHOR_ID")));
                 model.setTypeId(rs.getInt("REIMB_TYPE_ID"));
                 model.setAmount(rs.getBigDecimal("REIMB_AMOUNT"));
                 model.setVendor(rs.getString("REIMB_VENDOR"));

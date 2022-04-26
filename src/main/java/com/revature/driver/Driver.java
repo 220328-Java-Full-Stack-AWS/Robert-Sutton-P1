@@ -11,8 +11,8 @@ import java.util.*;
 
 public class Driver {
 
-    private static UserDao uDao = new UserDaoMockImp(); //After you connect to your database, you can swap UserDaoMockImp with your actual db logic
-    //private static UserDao uDao = new UserDao();
+    //private static UserDao uDao = new UserDaoMockImp(); //After you connect to your database, you can swap UserDaoMockImp with your actual db logic
+    private static UserDao uDao = new UserDao();
     private static UserService uServ = new UserService(uDao);
     private static PostDao pDao = new PostDaoMockImpl();
     private static PostService pServ = new PostService(pDao);
@@ -127,11 +127,9 @@ public class Driver {
                         System.out.println("Enter invoice number");
                         String invoice = scan.nextLine();
                         System.out.println("DEBUG: " + description + " " + u + " " + typeId + " " + amount );
-                        r = ReimbursementService.create(description, u, typeId, amount, vendor, invoice);
+                        r = ReimbursementService.create(description, u.getId(), typeId, amount, vendor, invoice);
 
                         System.out.println(r.toString());
-
-
 
                         break;
                     case 2:

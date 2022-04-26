@@ -3,7 +3,7 @@ package com.revature.dao;
 import com.revature.models.User;
 
 import java.util.List;
-
+/*
 public class UserDaoMockImp implements UserDao {
     @Override
     public User create(User model) {
@@ -59,7 +59,7 @@ public class UserDaoMockImp implements UserDao {
     //public User read(String first, String last) {
     //    return null;
     //}
-
+*/
 /*
     //We have our connection to the database
     private MockUserDB db = MockUserDB.getInstance();
@@ -82,4 +82,4 @@ public class UserDaoMockImp implements UserDao {
         db.getUdb().put(u.getUsername(), u);
     }
 */
-}
+

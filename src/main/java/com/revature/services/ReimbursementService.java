@@ -67,60 +67,22 @@ public class ReimbursementService {
         return Collections.emptyList();
     }
 
-    /**
-     * Why can't I get Create to work????
-     */
-    public static Reimbursement create(String description, User author, int typeId, BigDecimal amount, String vendor, String invoice) {
-        int authorId = author.getId();
-        System.out.println("Name: " + author.getFirst() + " " + author.getLast() + " " + authorId);
-        Reimbursement r = new Reimbursement(description, author, typeId, amount, vendor, invoice);
+    public static Reimbursement create(String description, int authorId, int typeId, BigDecimal amount, String vendor, String invoice) {
+        Reimbursement r = new Reimbursement(description, authorId, typeId, amount, vendor, invoice);
 
         //From the service, we would make our database call to actually store this reimbursement away
         ReimbursementDao dao = new ReimbursementDao();
 
+        int statusId = 1;
+        System.out.println("ReimbursementService Line 80:  Author = " + authorId + ", Status = " + statusId);
+        r.setDescription(description);
+        r.setAuthorId(authorId);
+        r.setTypeId(typeId);
+        r.setAmount(amount);
+        r.setVendor(vendor);
+        r.setInvoice(invoice);
+        r.setStatusId(statusId);
         dao.create(r);
         return r;
     }
-
-/*public static User register(String first, String last, String email, String password){
-		String username = getUserName(first, last);
-		User u = new User(first, last, username, email, password);
-		////From the service, we would make our database call to actually store this user away
-		UserDao dao = new UserDao() {
-
-			@Override
-			public User read(int id) {
-				return null;
-			}
-
-			@Override
-			public void update(User model) {
-
-			}
-
-			@Override
-			public void delete(int id) {
-
-			}
-
-			@Override
-			public void delete(User model) {
-
-			}
-
-			@Override
-			public List<User> getAll() {
-				return null;
-			}
-		};
-
-
-		dao.create(u);
-
-
-		return u;
-	}*/
-
-
-
 }

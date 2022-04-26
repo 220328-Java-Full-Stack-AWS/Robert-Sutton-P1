@@ -3,14 +3,15 @@ package com.revature.dao;
 import com.revature.ConnectionManager;
 import com.revature.models.User;
 
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public interface UserDao extends CRUDInterface<User> {
+public class UserDao implements CRUDInterface<User> {
 
     @Override
-    public default User create(User model) {
+    public User create(User model) {
         String SQL = "INSERT INTO ers_users (ERS_USERNAME, ers_password, USER_FIRST_NAME, USER_LAST_NAME, USER_EMAIL, USER_ROLE_ID) VALUES (?, ?, ?, ?, ?, ?)";
         try{
             System.out.println("user role fk value: " + model.getRole());
@@ -34,6 +35,30 @@ public interface UserDao extends CRUDInterface<User> {
         return model;
     }
 
+    @Override
+    public User read(int id) {
+        return null;
+    }
+
+    @Override
+    public void update(User model) {
+
+    }
+
+    @Override
+    public void delete(int id) {
+
+    }
+
+    @Override
+    public void delete(User model) {
+
+    }
+
+    @Override
+    public List<User> getAll() {
+        return null;
+    }
 
 
     public static User read(String username) {

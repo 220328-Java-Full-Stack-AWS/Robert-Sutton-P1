@@ -1,6 +1,7 @@
 package com.revature.dao;
 
 import com.revature.models.Model;
+import com.revature.models.User;
 
 import java.sql.Connection;
 import java.util.List;

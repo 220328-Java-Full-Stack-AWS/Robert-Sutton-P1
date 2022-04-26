@@ -35,9 +35,9 @@ public class Reimbursement extends com.revature.models.Model {
     private int id;
     private String description;
     private Date submitted;
-    private User author;
-    //private int authorId;
-    private int type;
+    //private User author;
+    private int authorId;
+    //private int type;
     private int typeId;
     private BigDecimal amount;
     private String vendor;
@@ -46,14 +46,6 @@ public class Reimbursement extends com.revature.models.Model {
     private int statusId;
     private User resolver;
     private int resolverId;
-
-    public User getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(User author) {
-        this.author = author;
-    }
 
 //public Reimbursement() {
     //    getAllReimbursements = new ArrayList<>();
@@ -72,10 +64,10 @@ public class Reimbursement extends com.revature.models.Model {
     }
 
 
-    public Reimbursement(int id, Status status, User author, BigDecimal amount) {
+    public Reimbursement(int id, Status status, int authorId, BigDecimal amount) {
         this.id = id;
         this.status = status;
-        this.author = author;
+        this.authorId = authorId;
         this.amount = amount;
 
     }
@@ -86,9 +78,9 @@ public class Reimbursement extends com.revature.models.Model {
         this.id = id;
         this.description = description;
         this.submitted = submitted;
-        this.author = author;
-        //this.authorId = authorId;
-        this.type = type;
+        //this.author = author;
+        this.authorId = authorId;
+        this.typeId = typeId;
         this.amount = amount;
         this.vendor = vendor;
         this.invoice = invoice;
@@ -96,9 +88,9 @@ public class Reimbursement extends com.revature.models.Model {
         this.resolver = resolver;
     }
 
-    public Reimbursement(String description, User author, int typeId, BigDecimal amount, String vendor, String invoice) {
+    public Reimbursement(String description, int authorId, int typeId, BigDecimal amount, String vendor, String invoice) {
         super();
-        System.out.println("Super Constructor: " + author.getId() + " Type: " + typeId);
+        System.out.println("Reimbursement, Line 101:  Super Constructor: " + authorId + " Type: " + typeId);
     }
 
     public int getId() {
@@ -129,16 +121,16 @@ public class Reimbursement extends com.revature.models.Model {
         this.vendor = email;
     }
 
-//    public int getAuthorId() {
-//        return authorId;
-//    }
-//
-//    public void setAuthorId(int authorId) {
-//        this.authorId = authorId;
-//    }
+    public int getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(int authorId) {
+        this.authorId = authorId;
+    }
 
     public int getTypeId() {
-        return type;
+        return typeId;
     }
 
     public void setTypeId(int typeId) {
@@ -157,6 +149,10 @@ public class Reimbursement extends com.revature.models.Model {
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
+
+    public String getDescription() { return description; }
+
+    public void setDescription(String description) { this.description = description; }
 
     /*
     public void setUsername(String username) {
@@ -190,6 +186,21 @@ public class Reimbursement extends com.revature.models.Model {
 
     public void setResolverId(int resolverId) {
         this.resolverId = resolverId;
+    }
+
+    @Override
+    public String toString() {
+        return "Reimbursement{" +
+                "Description = '" + description + '\'' +
+                ", author = '" + authorId + '\'' +
+                ", type = '" + typeId + '\'' +
+                ", amount = '" + amount + '\'' +
+                ", vendor = '" + vendor + '\'' +
+                ", invoice = '" + invoice + '\'' +
+                ", status = " + statusId +
+                ", resolver = " + resolverId +
+                //", following=" + following.size() +
+                '}';
     }
 
 
