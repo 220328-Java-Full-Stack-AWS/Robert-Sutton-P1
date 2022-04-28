@@ -23,6 +23,37 @@ CREATE TABLE ERS_REIMBURSEMENT(
 );
 
 SELECT * FROM ers_reimbursement
+--UPDATE ers_reimbursement SET reimb_status_id = 2 WHERE reimb_id = 23
+--UPDATE ers_reimbursement SET reimb_status_id = 1 WHERE reimb_status_id = 2
+--UPDATE ers_reimbursement SET reimb_status_id = 5, reimb_resolver_id = 1 WHERE reimb_id = 3
+
+-- Pending
+SELECT reimb_id, reimb_description, reimb_submitted, u.user_first_name, u.user_last_name, reimb_type, reimb_amount, reimb_vendor, reimb_invoice, reimb_status 
+FROM ERS_REIMBURSEMENT r 
+JOIN ers_users u 
+ON r.reimb_author_id = u.ers_users_id 
+JOIN ers_reimbursement_type t 
+ON r.reimb_type_id = t.reimb_type_id 
+JOIN ERS_REIMBURSEMENT_STATUS s
+ON r.reimb_status_id = s.reimb_status_id 
+WHERE r.reimb_status_id = 1 AND r.REIMB_AUTHOR_ID = 3
+
+
+-- Completed
+SELECT reimb_id, reimb_description, reimb_submitted, u.user_first_name, u.user_last_name, reimb_type, reimb_amount, reimb_vendor, reimb_invoice, reimb_status, eu.user_first_name AS Resolver_First_Name, eu.user_last_name AS Resolver_Last_Name  
+FROM ERS_REIMBURSEMENT r 
+JOIN ers_users u 
+ON r.reimb_author_id = u.ers_users_id 
+JOIN ers_reimbursement_type t 
+ON r.reimb_type_id = t.reimb_type_id 
+JOIN ERS_REIMBURSEMENT_STATUS s
+ON r.reimb_status_id = s.reimb_status_id 
+JOIN ers_users eu 
+ON r.reimb_resolver_id = eu.ers_users_id 
+WHERE r.reimb_status_id = 5 AND r.REIMB_AUTHOR_ID = 2
+
+SELECT reimb_id, reimb_description, reimb_submitted, u.user_first_name AS author_first_name, u.user_last_name AS author_last_name, reimb_type, reimb_amount, reimb_vendor, reimb_invoice, reimb_status, eu.user_first_name AS Resolver_First_Name, eu.user_last_name AS Resolver_Last_Name FROM ERS_REIMBURSEMENT r JOIN ers_users u ON r.reimb_author_id = u.ers_users_id JOIN ers_reimbursement_type t ON r.reimb_type_id = t.reimb_type_id JOIN ERS_REIMBURSEMENT_STATUS s ON r.reimb_status_id = s.reimb_status_id JOIN ers_users eu ON r.reimb_resolver_id = eu.ers_users_id WHERE r.reimb_status_id = 5 AND r.REIMB_AUTHOR_ID = 2
+
 
 
 DROP TABLE ers_users;

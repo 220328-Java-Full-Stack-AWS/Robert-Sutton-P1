@@ -2,9 +2,7 @@ package com.revature.driver;
 
 import com.revature.dao.*;
 import com.revature.models.*;
-import com.revature.services.PostService;
-import com.revature.services.ReimbursementService;
-import com.revature.services.UserService;
+import com.revature.services.*;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -17,11 +15,27 @@ public class Driver {
     private static PostDao pDao = new PostDaoMockImpl();
     private static PostService pServ = new PostService(pDao);
     private static Scanner scan = new Scanner(System.in);
+    private static String[] type = {"Travel-Gas",
+            "Travel-Fares",
+            "Travel-Lodging",
+            "Travel-Food",
+            "Travel-Entertain",
+            "Travel-Other",
+            "Emp-Dev-Tuition",
+            "Emp-Dev-License",
+            "Emp-Dev-Other"} ;
+    private static String[] status = {"Pending",
+            "Cancelled",
+            "Approved",
+            "Denied",
+            "Completed"} ;
 
-
-    public static void main(String[] args){
+    public static void main(String[] args) {
 
         System.out.println("Driver is driving.");
+
+
+
 
 
         /*
@@ -45,15 +59,15 @@ public class Driver {
 
         boolean mayRegister = false;
 
-        if(u == null) {
+        if (u == null) {
             System.out.println("You may register.");
             mayRegister = true;
         } else {
-            System.out.println("There is already a registered user, " + first + " "+ last);
+            System.out.println("There is already a registered user, " + first + " " + last);
             System.out.println(u.toString());
         }
 
-        if(mayRegister){
+        if (mayRegister) {
             System.out.println("Enter your Password below:");
             String psw = scan.nextLine();
             System.out.println("Enter your E-Mail below:");
@@ -71,20 +85,16 @@ public class Driver {
 
         u = UserDao.read(userName);
 
-        if(u == null) {
+        if (u == null) {
             System.out.println("Invalid UserName or Password!");
             System.out.println("Forgot password, enter 'F'");
             System.out.println("Register, enter 'R'");
             String action = scan.nextLine();
-        }
-        else {
+        } else {
             boolean loggedIn = true;
-            while(loggedIn){
+            while (loggedIn) {
 
                 Reimbursement r = new Reimbursement();
-
-
-
 
                 /*
 
@@ -96,29 +106,21 @@ public class Driver {
 
                 */
 
-                System.out.println("Please enter your choice (1 .. 4.");
+                System.out.println("Please enter your choice (1 .. 4.)");
                 System.out.println("1. Submit a request for reimbursement");
                 System.out.println("2. Cancel a pending request for reimbursement");
                 System.out.println("3. View my pending and completed past requests for reimbursement");
                 System.out.println("4. Edit my pending requests for reimbursement");
+                if (u.getRole() > 1) {
+                    System.out.println("5. Skip to administrative/finance.");
+                }
+
                 int iReimb = Integer.parseInt(scan.nextLine());
-                switch (iReimb){
+                switch (iReimb) {
                     case 1:
                         System.out.println("Describe the expense.");
                         String description = scan.nextLine();
-                        System.out.println("Enter type.");
-                        String[] type = {"Travel-Gas",
-                                "Travel-Fares",
-                                "Travel-Lodging",
-                                "Travel-Food",
-                                "Travel-Entertain",
-                                "Travel-Other",
-                                "Emp-Dev-Tuition",
-                                "Emp-Dev-License",
-                                "Emp-Dev-Other"} ;
-                        for(int i = 0; i < 9; i++) {
-                            System.out.println(i+1 + ". " + type[i]);
-                        }
+                        displayTypes();
                         int typeId = Integer.parseInt(scan.nextLine());
                         System.out.println("Enter expense amount ($)");
                         BigDecimal amount = new BigDecimal(scan.nextLine());
@@ -126,17 +128,108 @@ public class Driver {
                         String vendor = scan.nextLine();
                         System.out.println("Enter invoice number");
                         String invoice = scan.nextLine();
-                        System.out.println("DEBUG: " + description + " " + u + " " + typeId + " " + amount );
+                        System.out.println("DEBUG: " + description + " " + u + " " + typeId + " " + amount);
                         r = ReimbursementService.create(description, u.getId(), typeId, amount, vendor, invoice);
 
                         System.out.println(r.toString());
 
                         break;
                     case 2:
+                        // Read pending reimbursements for this user:
+                        List<ReimbursementPending> reimbursementsPending;
+                        reimbursementsPending = ReimbursementPendingService.getReimbursementsPendingByUserId(u.getId());
+
+                        for (ReimbursementPending rp : reimbursementsPending) {
+                            System.out.println("Reimbursement to be cancelled:" + rp.toString());
+                            System.out.println("Do you wish to cancel it (Y/N)?");
+                            if (scan.nextLine().toUpperCase().startsWith("Y")) {
+                                ReimbursementService.cancel(rp.getId());
+                            } else {
+                                continue;
+                            }
+                        }
                         break;
                     case 3:
+                        // Read pending reimbursements for this user:
+                        //List<ReimbursementPending> reimbursementsPending;
+                        reimbursementsPending = ReimbursementPendingService.getReimbursementsPendingByUserId(u.getId());
+                        for (ReimbursementPending rp : reimbursementsPending) {
+                            System.out.println("Pending reimbursement:" + rp.toString());
+                        }
+
+                        // Read completed reimbursements for this user:
+                        List<ReimbursementCompleted> reimbursementsCompleted;
+                        reimbursementsCompleted = ReimbursementCompletedService.getReimbursementsCompletedByUserIdStatusId(u.getId(), 5);
+                        for (ReimbursementCompleted rc : reimbursementsCompleted) {
+                            System.out.println("Completed reimbursement:" + rc.toString());
+                        }
                         break;
                     case 4:
+                        // Edit pending requests
+                        reimbursementsPending = ReimbursementPendingService.getReimbursementsPendingByUserId(u.getId());
+                        for (ReimbursementPending rp : reimbursementsPending) {
+                            System.out.println("Pending reimbursement:" + rp.toString());
+                            System.out.println("Do you wish to edit this item (Y/N)?");
+                            if (scan.nextLine().toUpperCase().startsWith("Y")) {
+
+                            } else {
+                                continue;
+                            }
+
+                            String desc = rp.getDescription();
+                            System.out.println(desc);
+                            System.out.println("Do you wish to edit this (Y/N)?");
+                            if (scan.nextLine().toUpperCase().startsWith("Y")) {
+                                System.out.println("Please enter the new item description.");
+                                desc = scan.nextLine();
+                            } else {
+
+                            }
+
+                            String type = rp.getType();
+                            int type_id = 0;
+                            System.out.println(type);
+                            System.out.println("Do you wish to edit this (Y/N)?");
+                            if (scan.nextLine().toUpperCase().startsWith("Y")) {
+                                System.out.println("Please enter the number for the expense category.");
+                                displayTypes();
+                                type_id = Integer.parseInt(scan.nextLine());
+                            } else {
+
+                            }
+
+                            String vend = rp.getVendor();
+                            System.out.println(vend);
+                            System.out.println("Do you wish to edit this vendor(Y/N)?");
+                            if (scan.nextLine().toUpperCase().startsWith("Y")) {
+                                System.out.println("Please enter the new vendor.");
+                                vend = scan.nextLine();
+                            } else {
+
+                            }
+
+                            String invc = rp.getInvoice();
+                            System.out.println(invc);
+                            System.out.println("Do you wish to edit this invoice(Y/N)?");
+                            if (scan.nextLine().toUpperCase().startsWith("Y")) {
+                                System.out.println("Please enter the new vendor.");
+                                invc = scan.nextLine();
+                            } else {
+
+                            }
+
+                            BigDecimal amnt = rp.getAmount();
+                            System.out.println(amnt);
+                            System.out.println("Do you wish to edit the expense amount(Y/N)?");
+                            if (scan.nextLine().toUpperCase().startsWith("Y")) {
+                                System.out.println("Please enter the new amount (omit $.");
+                                amnt = new BigDecimal(scan.nextLine());
+                            } else {
+
+                            }
+
+                            ReimbursementService.update(rp.getId(), desc, type_id, vend, invc, amnt);
+                        }
                         break;
                     default:
                         break;
@@ -148,7 +241,10 @@ public class Driver {
 
                 int roleNum = u.getRole();
 
-                if(roleNum > 1){
+                if (roleNum > 1) {
+
+                    Role r2 = Role.ADMIN;
+                    System.out.println(r2);
 
 
                     /*
@@ -161,126 +257,117 @@ public class Driver {
                     *
                     * */
 
+                    // Approve/Deny reimbursements
+                    System.out.println("Approve or Deny ---------------------------------");
 
+                    List<ReimbursementPending> reimbursementsPending;
+                    reimbursementsPending = ReimbursementPendingService.getReimbursementsPending();
+                    for (ReimbursementPending rp : reimbursementsPending) {
+                        System.out.println("Pending reimbursement:" + rp.toString());
+                        System.out.println("Do you wish to Approve, Deny, or Ignore this request (A/D/I) ?");
+                        char switchChar = scan.nextLine().toUpperCase().charAt(0);
+                        switch (switchChar) {
+                            case 'A':
+                                ReimbursementService.approve(rp.getId());
+                                break;
+                            case 'D':
+                                ReimbursementService.deny(rp.getId());
+                                break;
+                            case 'I':
+                            default:
+                                break;
+                        }
+                        continue;
+                    }
 
+                    // Filter requests by status
+                    System.out.println("Filter reimbursements by status");
 
-
+                    System.out.println("Enter status.");
+                    for (int i = 0; i < 5; i++) {
+                        System.out.println(i + 1 + ". " + status[i]);
+                    }
+                    iReimb = Integer.parseInt(scan.nextLine());
+                    System.out.println(status[iReimb-1] + "Reimbursements --------------------");
+                    List<Reimbursement> reimbursements;
+                    reimbursements = ReimbursementService.getReimbursementsByStatusId(iReimb);
+                    for (Reimbursement re : reimbursements) {
+                        System.out.println(re.toString());
+                    }
                 }
-
-
-
-
-
-
 
 
                 System.out.println("Do you wish to log out (Y/N)?");
                 String yn = scan.nextLine();
                 yn = yn.toUpperCase();
-                if(yn.startsWith("Y")) {
+                if (yn.startsWith("Y")) {
                     loggedIn = false;
                 }
-
-
-
             }
 
+            //User u = uServ.register("Ethan", "McGill", "ethan.mcgill@revature.com", "password");
+            //User u2 = uServ.register("Giorgi", "Amirajibi", "giorgi@mail.com", "password");
+            //List<User> users = uDao.getAllUsers();
+            //for(int i=0; i< users.size(); i++){
+            //    System.out.println(users.get(i));
+            //    System.out.println("Followers: " + users.get(i).getFollowers());
+            //    System.out.println("Following: " + users.get(i).getFollowing());
+            //}
+            //uServ.followUser(u, u2.getUsername());
+            //System.out.println(uDao.getAllUsers());
+            //for(int i=0; i< users.size(); i++){
+            //    System.out.println(users.get(i));
+            //    System.out.println("Followers: " + users.get(i).getFollowers());
+            //    System.out.println("Following: " + users.get(i).getFollowing());
+            //}
+            //System.out.println(uServ.topRankedUsers());
 
 
+            //MockUserDB.getInstance().populateUsers();
+            //MockPostDB.getInstance().populatePosts();
 
+            //User loggedIn = null;
+            //boolean done = false;
+            //We probably need user input
+            //Scanner scan = new Scanner(System.in);
 
+            //We want to loop forever until the user decides they are done
 
-
-
-
-
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //User u = uServ.register("Ethan", "McGill", "ethan.mcgill@revature.com", "password");
-        //User u2 = uServ.register("Giorgi", "Amirajibi", "giorgi@mail.com", "password");
-        //List<User> users = uDao.getAllUsers();
-        //for(int i=0; i< users.size(); i++){
-        //    System.out.println(users.get(i));
-        //    System.out.println("Followers: " + users.get(i).getFollowers());
-        //    System.out.println("Following: " + users.get(i).getFollowing());
-        //}
-        //uServ.followUser(u, u2.getUsername());
-        //System.out.println(uDao.getAllUsers());
-        //for(int i=0; i< users.size(); i++){
-        //    System.out.println(users.get(i));
-        //    System.out.println("Followers: " + users.get(i).getFollowers());
-        //    System.out.println("Following: " + users.get(i).getFollowing());
-        //}
-        //System.out.println(uServ.topRankedUsers());
-
-
-        //MockUserDB.getInstance().populateUsers();
-        //MockPostDB.getInstance().populatePosts();
-
-        //User loggedIn = null;
-        //boolean done = false;
-        //We probably need user input
-        //Scanner scan = new Scanner(System.in);
-
-        //We want to loop forever until the user decides they are done
-
-        //while(!done){
+            //while(!done){
             //Do our logic
             //Check to see if we have a logged in user
             //if(loggedIn == null){
-                //Not being logged in, we have two options
-                //Register a user
-                //Login
-                //Prompt the user
-                //System.out.println("Do you want to login or register? Choose 1 for register, 2 for login");
-                //Get their input
-                //int choice = scan.nextInt();
-                //scan.nextLine();
-                //Do the logic based on their input
-                //if(choice == 1){
-                    //Prompt them for their name, email, password
-                    //System.out.println("Enter your first name below:");
-                    //String first = scan.nextLine();
-                    //System.out.println("Enter your last name below:");
-                    //String last = scan.nextLine();
-                    //System.out.println("Enter your email below:");
-                    //String email = scan.nextLine();
-                    //System.out.println("Enter your password below");
-                    //String password = scan.nextLine();
-                    //uServ.register(first, last, email, password);
-                    //System.out.println(uDao.getAllUsers());
-                //}
-                //else{
-                //    //Prompt for username and password
-                //    System.out.println("Enter your username below");
-                //    String username = scan.nextLine();
-                //    System.out.println("Enter your password below");
-                //    String password = scan.nextLine();
-                //    loggedIn = uServ.login(username, password);
-                //    System.out.println(loggedIn);
-                //}
+            //Not being logged in, we have two options
+            //Register a user
+            //Login
+            //Prompt the user
+            //System.out.println("Do you want to login or register? Choose 1 for register, 2 for login");
+            //Get their input
+            //int choice = scan.nextInt();
+            //scan.nextLine();
+            //Do the logic based on their input
+            //if(choice == 1){
+            //Prompt them for their name, email, password
+            //System.out.println("Enter your first name below:");
+            //String first = scan.nextLine();
+            //System.out.println("Enter your last name below:");
+            //String last = scan.nextLine();
+            //System.out.println("Enter your email below:");
+            //String email = scan.nextLine();
+            //System.out.println("Enter your password below");
+            //String password = scan.nextLine();
+            //uServ.register(first, last, email, password);
+            //System.out.println(uDao.getAllUsers());
+            //}
+            //else{
+            //    //Prompt for username and password
+            //    System.out.println("Enter your username below");
+            //    String username = scan.nextLine();
+            //    System.out.println("Enter your password below");
+            //    String password = scan.nextLine();
+            //    loggedIn = uServ.login(username, password);
+            //    System.out.println(loggedIn);
+            //}
 
             //}
             //else{
@@ -295,49 +382,57 @@ public class Driver {
             //            Set<Post> feed = pServ.getUserFeed(loggedIn);
             //            Iterator<Post> pIt = feed.iterator();
             //            while(pIt.hasNext()){
-             //              Post p = pIt.next();
-             //              System.out.println(p.getUser().getUsername() + "\t\t\t\t" + p.getTimestamp().toString());
-             //              System.out.println(p.getContent());
-             //              System.out.println();
-             //          }
-             //          break;
-             //      case 2:
-             //          System.out.println("Here are our top users you may want to follow");
-             //          List<User> topUsers = uServ.topRankedUsers();
-             //          //We can use an iterator to loop through our users
-             //          System.out.println("Username\t\t\t\tFollowers");
-             //          Iterator<User> userIterator = topUsers.iterator();
-             //          //This is how we can loop through the entire list of users with an iterator
-             //          while(userIterator.hasNext()){
-             //              u = userIterator.next();
-             //              System.out.println(u.getUsername() +"\t\t\t\t" + u.getFollowers().size());
-             //          }
-             //          System.out.println("Please input a user you would like to follow");
-             //          String username = scan.nextLine();
-             //         uServ.followUser(loggedIn, username);
-             //         System.out.println(loggedIn);
-             //         break;
-             //     case 3:
-             //         System.out.println("Please enter the text of your post");
-             //         String content = scan.nextLine();
+            //              Post p = pIt.next();
+            //              System.out.println(p.getUser().getUsername() + "\t\t\t\t" + p.getTimestamp().toString());
+            //              System.out.println(p.getContent());
+            //              System.out.println();
+            //          }
+            //          break;
+            //      case 2:
+            //          System.out.println("Here are our top users you may want to follow");
+            //          List<User> topUsers = uServ.topRankedUsers();
+            //          //We can use an iterator to loop through our users
+            //          System.out.println("Username\t\t\t\tFollowers");
+            //          Iterator<User> userIterator = topUsers.iterator();
+            //          //This is how we can loop through the entire list of users with an iterator
+            //          while(userIterator.hasNext()){
+            //              u = userIterator.next();
+            //              System.out.println(u.getUsername() +"\t\t\t\t" + u.getFollowers().size());
+            //          }
+            //          System.out.println("Please input a user you would like to follow");
+            //          String username = scan.nextLine();
+            //         uServ.followUser(loggedIn, username);
+            //         System.out.println(loggedIn);
+            //         break;
+            //     case 3:
+            //         System.out.println("Please enter the text of your post");
+            //         String content = scan.nextLine();
 
-             //         pServ.createPost(loggedIn, content);
+            //         pServ.createPost(loggedIn, content);
 
-             //         //Just to check and make sure that the users post got put in the database
-             //         System.out.println(pDao.getPostsByUser(loggedIn.getUsername()));
+            //         //Just to check and make sure that the users post got put in the database
+            //         System.out.println(pDao.getPostsByUser(loggedIn.getUsername()));
 
-             //         break;
-             //     default:
-             //         System.out.println("I didn't quite catch that. Please reenter your choice");
-             // }
+            //         break;
+            //     default:
+            //         System.out.println("I didn't quite catch that. Please reenter your choice");
+            // }
 
-               // System.out.println("Are you tired of using this garbage app (Y/N)?");
-               // String s = scan.nextLine();
-               // s = s.toUpperCase(Locale.ROOT);
-               // if(s.startsWith("Y")){
-               //     done = true;
-               // }
-            //}
+            // System.out.println("Are you tired of using this garbage app (Y/N)?");
+            // String s = scan.nextLine();
+            // s = s.toUpperCase(Locale.ROOT);
+            // if(s.startsWith("Y")){
+            //     done = true;
+            // }
+
+        }
+    }
+
+        private static void displayTypes () {
+            System.out.println("Enter type.");
+            for (int i = 0; i < 9; i++) {
+                System.out.println(i + 1 + ". " + type[i]);
+            }
         }
 
         //Tree set and Comparator in action today
@@ -362,5 +457,4 @@ public class Driver {
 //
         //System.out.println("Goodbye");
     //}
-
 }

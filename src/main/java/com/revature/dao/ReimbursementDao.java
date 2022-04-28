@@ -2,10 +2,12 @@ package com.revature.dao;
 
 import com.revature.ConnectionManager;
 import com.revature.models.Reimbursement;
-import com.revature.models.User;
+import com.revature.models.ReimbursementPending;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,7 +61,7 @@ public class ReimbursementDao implements CRUDInterface<Reimbursement>{
             while (rs.next()) {
                 hasRows = true;
                 model.setId(rs.getInt("REIMB_ID"));
-                model.setSubmitted(rs.getDate("REIMB_SUBMITTED"));
+                model.setSubmitted(rs.getTimestamp("REIMB_SUBMITTED"));
                 model.setAuthorId((rs.getInt("REIMB_AUTHOR_ID")));
                 model.setTypeId(rs.getInt("REIMB_TYPE_ID"));
                 model.setAmount(rs.getBigDecimal("REIMB_AMOUNT"));
@@ -67,27 +69,6 @@ public class ReimbursementDao implements CRUDInterface<Reimbursement>{
                 model.setInvoice(rs.getString("REIMB_INVOICE"));
                 model.setStatusId(rs.getInt("REIMB_STATUS_ID"));
                 model.setResolverId(rs.getInt("REIMB_RESOLVER_ID"));
-
-                /*REIMB_ID    		serial PRIMARY KEY,
-	REIMB_DESCRIPTION	VARCHAR(500),
-	REIMB_SUBMITTED		TIMESTAMP,
-	REIMB_AUTHOR_ID		INT,
-	REIMB_TYPE_ID		INT,
-	REIMB_AMOUNT		DECIMAL(10, 2),
-	REIMB_VENDOR		VARCHAR(200),
-	REIMB_INVOICE		VARCHAR(50),
-	--REIMB_RECEIPT		BLOB,
-	REIMB_STATUS_ID		INT,
-	REIMB_RESOLVER_ID	INT,
-	CONSTRAINT ers_reimbursement_author_fkey FOREIGN KEY (REIMB_AUTHOR_ID) REFERENCES ERS_USERS (ERS_USERS_ID),
-	CONSTRAINT ers_reimbursement_resolver_fkey FOREIGN KEY (REIMB_RESOLVER_ID) REFERENCES ERS_USERS (ERS_USERS_ID),
-	CONSTRAINT ers_reimbursement_status_fkey FOREIGN KEY (REIMB_STATUS_ID) REFERENCES ERS_REIMBURSEMENT_STATUS (REIMB_STATUS_ID),
-	CONSTRAINT ers_reimbursement_type_fkey FOREIGN KEY (REIMB_TYPE_ID) REFERENCES ERS_REIMBURSEMENT_TYPE (REIMB_TYPE_ID)
-);*/
-
-
-
-
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -95,36 +76,124 @@ public class ReimbursementDao implements CRUDInterface<Reimbursement>{
         return model;
     }
 
-    public static User read(String username) {
-        User model = new User();
+    public static List<Reimbursement> read(int authorId, int statusId){
         boolean hasRows = false;
+        List<Reimbursement> reimbursements = new ArrayList<>();
         try{
-            String SQL = "SELECT * FROM ers_users WHERE ers_username = ?";
+            String SQL = "SELECT * FROM ERS_REIMBURSEMENT WHERE REIMB_AUTHOR_ID = ? AND REIMB_STATUS_ID = ?";
             Connection conn = ConnectionManager.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(SQL);
-            pstmt.setString(1,username);
+            pstmt.setInt(1, authorId);
+            pstmt.setInt(2, statusId);
             ResultSet rs = pstmt.executeQuery();
+
             while (rs.next()) {
                 hasRows = true;
-                model.setId(rs.getInt("ERS_USERS_ID"));
-                model.setFirst(rs.getString("USER_FIRST_NAME"));
-                model.setLast(rs.getString("USER_LAST_NAME"));
-                model.setUsername(rs.getString("ERS_USERNAME"));
-                model.setPassword(rs.getString("ers_password"));
-                model.setEmail(rs.getString("USER_EMAIL"));
-                model.setRole(rs.getInt("USER_ROLE_ID"));
+                Reimbursement model = new Reimbursement();
+                model.setId(rs.getInt("REIMB_ID"));
+                model.setDescription(rs.getString("REIMB_DESCRIPTION"));
+                model.setSubmitted(rs.getTimestamp("REIMB_SUBMITTED"));
+                model.setAuthorId((rs.getInt("REIMB_AUTHOR_ID")));
+                model.setTypeId(rs.getInt("REIMB_TYPE_ID"));
+                model.setAmount(rs.getBigDecimal("REIMB_AMOUNT"));
+                model.setVendor(rs.getString("REIMB_VENDOR"));
+                model.setInvoice(rs.getString("REIMB_INVOICE"));
+                model.setStatusId(rs.getInt("REIMB_STATUS_ID"));
+                model.setResolverId(rs.getInt("REIMB_RESOLVER_ID"));
+                reimbursements.add(model);
             }
-        } catch (SQLException e){
+        } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
-        if(hasRows){
-            return model;
-        } else {
-            return null;
+        return reimbursements;
+    }
+
+    public static List<Reimbursement>getReimbursementsByStatusId(int statusId) {
+        boolean hasRows = false;
+        List<Reimbursement> reimbursements = new ArrayList<>();
+        try{
+            String SQL = "SELECT * FROM ERS_REIMBURSEMENT WHERE REIMB_STATUS_ID = ?";
+            Connection conn = ConnectionManager.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(SQL);
+            pstmt.setInt(1, statusId);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                hasRows = true;
+                Reimbursement model = new Reimbursement();
+                model.setId(rs.getInt("REIMB_ID"));
+                model.setDescription(rs.getString("REIMB_DESCRIPTION"));
+                model.setSubmitted(rs.getTimestamp("REIMB_SUBMITTED"));
+                model.setAuthorId((rs.getInt("REIMB_AUTHOR_ID")));
+                model.setTypeId(rs.getInt("REIMB_TYPE_ID"));
+                model.setAmount(rs.getBigDecimal("REIMB_AMOUNT"));
+                model.setVendor(rs.getString("REIMB_VENDOR"));
+                model.setInvoice(rs.getString("REIMB_INVOICE"));
+                model.setStatusId(rs.getInt("REIMB_STATUS_ID"));
+                model.setResolverId(rs.getInt("REIMB_RESOLVER_ID"));
+                reimbursements.add(model);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return reimbursements;
+    }
+
+    public static void cancel(int id){
+        try {
+            update( id, 2);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
+    public static void approve(int id){
+        try {
+            update( id, 3);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void deny(int id) {
+        try {
+            update( id, 4);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void update(int id, int statusId){
+        try {
+            String SQL = "UPDATE ers_reimbursement SET reimb_status_id = ? WHERE reimb_id = ?";
+            Connection conn = ConnectionManager.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(SQL);
+            pstmt.setInt(1, statusId);
+            pstmt.setInt(2, id);
+            pstmt.executeUpdate();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void update(int id, String desc, int type_id, String vend, String invc, BigDecimal amnt) {
+        try {
+            String SQL = "UPDATE ers_reimbursement SET reimb_description = ?, reimb_type_id = ?, " +
+                    "reimb_amount = ?, reimb_vendor = ?, reimb_invoice = ? WHERE reimb_id = ?;";
+
+            Connection conn = ConnectionManager.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(SQL);
+            pstmt.setString(1, desc);
+            pstmt.setInt(2, type_id);
+            pstmt.setBigDecimal(3, amnt);
+            pstmt.setString(4, vend);
+            pstmt.setString(5, invc);
+            pstmt.setInt(6, id);
+            pstmt.executeUpdate();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void update(Reimbursement model){

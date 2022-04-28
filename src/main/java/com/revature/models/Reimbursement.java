@@ -1,15 +1,9 @@
 package com.revature.models;
 
-import com.revature.dao.ReimbursementDao;
-import com.revature.dao.UserDao;
-import sun.security.krb5.internal.crypto.EType;
-
 import java.math.BigDecimal;
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 /**
  * This concrete Reimbursement class can include additional fields that can be used for
@@ -34,7 +28,7 @@ public class Reimbursement extends com.revature.models.Model {
 
     private int id;
     private String description;
-    private Date submitted;
+    private Timestamp submitted;
     //private User author;
     private int authorId;
     //private int type;
@@ -93,6 +87,10 @@ public class Reimbursement extends com.revature.models.Model {
         System.out.println("Reimbursement, Line 101:  Super Constructor: " + authorId + " Type: " + typeId);
     }
 
+    public Reimbursement(String description, int authorId, int typeId, BigDecimal amount, String vendor, String invoice, int resolverId) {
+        super();
+    }
+
     public int getId() {
         return id;
     }
@@ -101,11 +99,11 @@ public class Reimbursement extends com.revature.models.Model {
         this.id = id;
     }
 
-    public java.util.Date getSubmitted() {
+    public Timestamp getSubmitted() {
         return submitted;
     }
 
-    public void setSubmitted(Date submitted) {
+    public void setSubmitted(Timestamp submitted) {
         this.submitted = submitted;
     }
 

@@ -67,6 +67,14 @@ public class ReimbursementService {
         return Collections.emptyList();
     }
 
+    public static List<Reimbursement>getReimbursementsByStatusId(int statusId) {
+        return ReimbursementDao.getReimbursementsByStatusId(statusId);
+    }
+
+    public static List<Reimbursement> getReimbursementsByUserIdStatusId(int userId, int statusId) {
+        return ReimbursementDao.read(userId, statusId);
+    }
+
     public static Reimbursement create(String description, int authorId, int typeId, BigDecimal amount, String vendor, String invoice) {
         Reimbursement r = new Reimbursement(description, authorId, typeId, amount, vendor, invoice);
 
@@ -85,4 +93,24 @@ public class ReimbursementService {
         dao.create(r);
         return r;
     }
+
+
+    //public static void update(int id) { ReimbursementDao.update(id); }
+
+    public static void update(int id, String desc, int type_id, String vend, String invc, BigDecimal amnt){
+        ReimbursementDao.update(id, desc, type_id, vend, invc, amnt);
+    }
+
+    public static void cancel(int id) {
+        ReimbursementDao.cancel(id);
+    }
+
+    public static void approve(int id) { ReimbursementDao.approve(id); }
+
+    public static void deny(int id) { ReimbursementDao.deny(id); }
+
+
+
+
+
 }
